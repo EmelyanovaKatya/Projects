@@ -1,0 +1,111 @@
+Mn <- function(R, A){
+min <- Inf
+m <- "c"
+for(i in 1:length(A)){
+if((R[i] < min) & (A[i] == 0)){
+m <- i
+min <- R[i]
+}
+}
+return(m)
+}
+
+Dejkstra <- function(M, V1, V2){
+
+n <- ncol(M) #кол-во вершин
+if(!(V1 %in% (1:n))){
+stop("neverno zadana Vershina")
+}
+if(!(V2 %in% (1:n))){
+stop("neverno zadana Vershina")
+}
+if(!(is.numeric(V1))){
+stop("neverno zadana Vershina")
+}
+if(!(is.numeric(V2))){
+stop("neverno zadana Vershina")
+}
+if(V1 == V2){
+stop("zadajte raznie Vershini")
+}
+
+R <- M[V1,]
+A <- rep(0, n)
+A[V1] <- 1
+P <- rep(0, n)
+P[(M[V1,] != Inf)] <- V1
+
+while(sum(A) != length(A)){
+k <- Mn(R, A)
+if(k == "c"){break()}
+for(i in 1:n){
+if(R[i] > (R[k] + M[k, i])){
+R[i] <- R[k] + M[k, i]
+P[i] <- k
+}
+A[k] <- 1
+}
+}
+
+predki <- P
+
+if(P[V2] != 0){ # раскручивание пути
+path <- V2
+if(P[V2] == V1){
+path <- c(V1, V2)
+}else{
+while(P[V2] != V1){
+P[V2] <- P[path[1]]
+path <- c(P[V2], path)
+}
+}
+}else{
+path <- Inf
+}
+
+#вывод: предки, путь, R[V2] (метки, стоимость)
+
+otv <- path
+return(otv)
+}
+
+# задаем матрицу
+M <- matrix(c(
+Inf, Inf, 100, 5,
+Inf, Inf, Inf, 1,
+Inf, 1, Inf, Inf,
+Inf, Inf, 1, Inf), nrow = 4, ncol = 4, byrow = T)
+
+V1 <- 3
+V2 <- 2
+
+otvet <- Dejkstra(M, V1, V2)
+path <- otvet
+
+
+way <- function(path){
+g <- c()
+for(i in 1:length(path)){
+if((path[i] != path[1]) & (path[i] != path[length(path)])){
+g <- c(g, path[i], path[i])
+}
+}
+return(c(path[1], g, path[length(path)]))
+}
+
+
+#граф
+g <- M
+g[g == Inf] <- 0
+a <- graph.adjacency(g, mode = "directed", weighted = T)
+
+V(a)$color <- "orange"
+V(a)[V1]$color <- "red"
+V(a)[V2]$color <- "green"
+
+f <- way(path)
+pyt <- get.edge.ids(a, f)
+E(a)$color <- "gray"
+E(a)[pyt]$color <- "blue"
+set.seed(4)
+plot(a, edge.label = E(a)$weight)
