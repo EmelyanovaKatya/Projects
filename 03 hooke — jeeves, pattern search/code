@@ -1,0 +1,29 @@
+zel <- function(x,y){
+ return((1-x)^2 + 100*(y-x^2)^2)
+}
+
+djivs <- function(e, h, x0, y0, sh){
+ sh1 <- 0
+while ((h > e)&(sh1 <= sh)) {
+ dvig <- function(x0, y0, h){
+ xh <- c(0, -h, h)[which.min(zel(x0 + c(0, -h, h), y0))]
+ x0 <- x0 + xh
+ yh <- c(0, -h, h)[which.min(zel(x0, y0 + c(0, -h, h)))]
+ return(c(xh, yh))
+ }
+ napr <- dvig(x0, y0, h)
+ sh1 <- sh1 + 6
+ if (napr[1]^2 + napr[2]^2 != 0){
+ while(zel(x0,y0) > zel(x0 + napr[1], y0 + napr[2])){
+ x0 <- x0 + napr[1]
+ y0 <- y0 + napr[2]
+ sh1 <- sh1 + 2
+ }
+ }else{
+ h <- h/2
+ }
+ 
+}
+ return(c(x0, y0, sh1))
+}
+min <- djivs(0.000001, 5, 10, 10, 1000)
