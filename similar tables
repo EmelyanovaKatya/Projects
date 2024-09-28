@@ -1,0 +1,30 @@
+uni <- function(x){ 
+ unique_vec <- c() 
+ for(i in 1:length(x)){ 
+ if(!(x[i] %in% unique_vec)){ 
+ unique_vec <- c(unique_vec, x[i]) 
+ } 
+ } 
+ return(unique_vec) 
+} 
+ 
+poho <- function(z,y){ 
+ m1 <- uni(z)
+ m2 <- uni(y)
+ a <- sort(m1) 
+ b <- sort(m2) 
+ 
+i <- 1
+j <- 1
+while(i<=(length (a)) & j <=(length (b)) & a[i]==b[j]){
+i <- i+1
+j <- j+1
+}
+if (i==length(a)+1 & j==length(b)+1){
+otvet <-'massivi pohozi'
+}else{
+otvet <-'massivi ne pohozi'
+}
+ return(otvet) 
+} 
+otvet <- poho(c(1,3,4,6,7,2,5,5,7,7),c(1,3,4,6,2,5,8,7,2,2,3,1,6,6,5))
