@@ -1,0 +1,132 @@
+def detect_letter(n, grid):
+    # Находим границы внешнего прямоугольника с горящими светодиодами
+    x1 = y1 = n
+    x2 = y2 = -1
+
+    for i in range(n):
+        for j in range(n):
+            if grid[i][j] == '#':
+                x1, y1 = min(x1, j), min(y1, i)
+                x2, y2 = max(x2, j), max(y2, i)
+
+    # Если не обнаружено никакого включенного прямоугольника
+    if x2 == -1:
+        return 'X'
+
+    # Проверка на форму буквы "I" (весь прямоугольник заполнен)
+    is_full = all(grid[i][j] == '#' for i in range(y1, y2 + 1) for j in range(x1, x2 + 1))
+    if is_full:
+        return 'I'
+
+    # Находим все выключенные прямоугольники внутри внешнего
+    inner_off_rectangles = []
+    visited = set()
+    
+    for i in range(y1, y2 + 1):
+        for j in range(x1, x2 + 1):
+            if grid[i][j] == '.' and (i, j) not in visited:
+                # Расширяем выключенный прямоугольник
+                iy1, ix1 = i, j
+                iy2, ix2 = i, j
+                while iy2 + 1 <= y2 and all(grid[iy2 + 1][k] == '.' for k in range(ix1, ix2 + 1)):
+                    iy2 += 1
+                while ix2 + 1 <= x2 and all(grid[k][ix2 + 1] == '.' for k in range(iy1, iy2 + 1)):
+                    ix2 += 1
+
+                # Обновляем посещенные позиции
+                for k in range(iy1, iy2 + 1):
+                    for l in range(ix1, ix2 + 1):
+                        visited.add((k, l))
+
+                # Добавляем найденный прямоугольник
+                inner_off_rectangles.append((ix1, iy1, ix2, iy2))
+
+    # Проверки на каждую букву
+    if len(inner_off_rectangles) == 1:
+        ix1, iy1, ix2, iy2 = inner_off_rectangles[0]
+        
+        # Проверка на букву "O"
+        if x1 < ix1 < ix2 < x2 and y1 < iy1 < iy2 < y2:
+            return 'O'
+        
+        if x1 < ix1 == ix2 < x2 and y1 < iy1 == iy2 < y2:
+            return 'O'
+        
+        # Проверка на букву "C"
+        if x1 < ix1 < ix2 == x2 and y1 < iy1 < iy2 < y2:
+            return 'C'
+
+        if x1 < ix1 == ix2 == x2 and y1 < iy1 == iy2 < y2:
+            return 'C'
+        
+        if x1 < ix1 == ix2 == x2 and y1 < iy1 < iy2 < y2:
+            return 'C'
+        
+        if x1 < ix1 < ix2 == x2 and y1 < iy1 == iy2 < y2:
+            return 'C'
+        
+        # Проверка на букву "L"
+        if x1 < ix1 < ix2 == x2 and y1 == iy1 < iy2 < y2:
+            return 'L'
+        
+        if x1 < ix1 == ix2 == x2 and y1 == iy1 == iy2 < y2:
+            return 'L'
+        
+        if x1 < ix1 == ix2 == x2 and y1 == iy1 < iy2 < y2:
+            return 'L'
+        
+        if x1 < ix1 < ix2 == x2 and y1 == iy1 == iy2 < y2:
+            return 'L'
+
+    elif len(inner_off_rectangles) == 2:
+        (ix1, iy1, ix2, iy2), (jx1, jy1, jx2, jy2) = inner_off_rectangles
+        
+        # Проверка на букву "H"
+        if (x1 < ix1 == jx1 < ix2 == jx2 < x2 and 
+            y1 == iy1 < iy2 < jy1 < jy2 == y2):
+            return 'H'
+        
+        if (x1 < ix1 == jx1 == ix2 == jx2 < x2 and 
+            y1 == iy1 == iy2 < jy1 == jy2 == y2):
+            return 'H'
+        
+        if (x1 < ix1 == jx1 == ix2 == jx2 < x2 and 
+            y1 == iy1 == iy2 < jy1 < jy2 == y2):
+            return 'H'
+        
+        if (x1 < ix1 == jx1 == ix2 == jx2 < x2 and 
+            y1 == iy1 < iy2 < jy1 == jy2 == y2):
+            return 'H'
+        
+        if (x1 < ix1 == jx1 < ix2 == jx2 < x2 and 
+            y1 == iy1 == iy2 < jy1 == jy2 == y2):
+            return 'H'
+        
+        # Проверка на букву "P"
+        if (x1 < ix1 == jx1 < ix2 < jx2 == x2 and
+            y1 < iy1 < iy2 < jy1 < jy2 == y2):
+            return 'P'
+        
+        if (x1 < ix1 == jx1 == ix2 < jx2 == x2 and
+            y1 < iy1 == iy2 < jy1 == jy2 == y2):
+            return 'P'
+        
+        if (x1 < ix1 == jx1 == ix2 < jx2 == x2 and
+            y1 < iy1 == iy2 < jy1 < jy2 == y2):
+            return 'P'
+        
+        if (x1 < ix1 == jx1 == ix2 < jx2 == x2 and
+            y1 < iy1 < iy2 < jy1 < jy2 == y2):
+            return 'P'
+        
+        if (x1 < ix1 == jx1 < ix2 < jx2 == x2 and
+            y1 < iy1 == iy2 < jy1 == jy2 == y2):
+            return 'P'
+    
+    # Если не подходит под другие условия, возвращаем X
+    return 'X'
+
+# Чтение данных
+n = int(input())
+grid = [input().strip() for _ in range(n)]
+print(detect_letter(n, grid))
